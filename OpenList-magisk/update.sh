@@ -100,8 +100,19 @@ download_and_extract() {
 
 update_and_restart() {
     sed -i "s/^version=.*/version=v${url_version}/g" "${MODDIR}/module.prop"
-    pkill -f 'openlist' >/dev/null 2>&1
-    sleep 3
+    
+    pkill -f 'openlist server' >/dev/null 2>&1
+    
+    local timeout=3
+    local elapsed=0
+    while pgrep -f 'openlist server' >/dev/null; do
+        if [ $elapsed -ge $timeout ]; then
+            pkill -9 -f 'openlist server' >/dev/null 2>&1
+            break
+        fi
+        sleep 1
+        elapsed=$((elapsed + 1))
+    done
 }
 
 check_update() {
