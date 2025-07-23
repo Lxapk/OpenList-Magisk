@@ -2,9 +2,15 @@ name: OpenList-Magisk Release
 
 on:
   workflow_dispatch:
+    inputs:
+      version_bump:
+        description: '版本号更新类型 (major/minor/patch)'
+        required: true
+        default: 'patch'
 
 env:
   REPO_NAME: OpenList-Magisk
+  VERSION_FILE: version.txt  # 存储版本号的文件
 
 jobs:
   build:
@@ -14,36 +20,86 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Zip
+      - name: Initialize version
+        id: version
+        run: |
+          # 检查版本文件是否存在，不存在则创建初始版本 v1.0.0
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "v1.0.0" > $VERSION_FILE
+          fi
+          
+          # 读取当前版本
+          CURRENT_VERSION=$(cat $VERSION_FILE)
+          echo "当前版本: $CURRENT_VERSION"
+          
+          # 解析版本号
+          VERSION=${CURRENT_VERSION#v}
+          IFS='.' read -ra VERSION_PARTS <<< "$VERSION"
+          MAJOR=${VERSION_PARTS[0]}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+
+          # 根据输入更新版本号
+          BUMP_TYPE=${{ github.event.inputs.version_bump }}
+          case $BUMP_TYPE in
+            major)
+              NEW_VERSION="v$((MAJOR + 1)).0.0"
+              ;;
+            minor)
+              NEW_VERSION="v${MAJOR}.$((MINOR + 1)).0"
+              ;;
+            patch)
+              NEW_VERSION="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+              ;;
+            *)
+              echo "无效的版本更新类型: $BUMP_TYPE"
+              exit 1
+              ;;
+          esac
+          
+          # 保存新版本到环境变量
+          echo "新版本: $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "::set-output name=new_version::$NEW_VERSION"
+
+      - name: Update version file
+        run: |
+          echo "$NEW_VERSION" > $VERSION_FILE
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add $VERSION_FILE
+          git commit -m "🔖 版本号更新至 $NEW_VERSION"
+          git push
+
+      - name: Create version tag
+        run: |
+          git tag -a "$NEW_VERSION" -m "版本 $NEW_VERSION"
+          git push origin "$NEW_VERSION"
+
+      - name: Zip artifacts
         run: |
           cd OpenList-magisk
-          zip -r ../${{ env.REPO_NAME }}.zip . -x ".git*" -x ".github/*"
-
+          zip -r ../${{ env.REPO_NAME }}-$NEW_VERSION.zip . -x ".git*" -x ".github/*"
 
       - name: Generate release note
         run: |
-          cat <<EOF > ${{ env.REPO_NAME }}-release.txt
+          cat <<EOF > release_notes.txt
+          🚀 ${{ env.REPO_NAME }} $NEW_VERSION 发布
           🌐 管理地址: http://0.0.0.0:5244
-          ⏱️ 编译时间: $(date -d "${{ github.event.repository.updated_at }}" +"%Y-%m-%d %H:%M:%S")
+          📅 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
           👤 用户名: admin
           🔑 密码: 请在 KsuWebUI 中自行修改
+          ⬆️ 版本更新: ${{ github.event.inputs.version_bump }} 级别更新
           EOF
 
-      - name: Create/force tag
-        run: |
-          TAG="${{ env.REPO_NAME }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -f "$TAG" || git tag "$TAG"
-          git push -f origin "$TAG"
-
-      - name: Release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.REPO_NAME }}
-          name: ${{ env.REPO_NAME }}
-          body_path: ${{ env.REPO_NAME }}-release.txt
+          tag_name: ${{ env.NEW_VERSION }}
+          name: "${{ env.REPO_NAME }} ${{ env.NEW_VERSION }}"
+          body_path: release_notes.txt
           files: |
-            ${{ env.REPO_NAME }}.zip
-            ${{ env.REPO_NAME }}-release.txt
+            ${{ env.REPO_NAME }}-${{ env.NEW_VERSION }}.zip
