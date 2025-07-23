@@ -1,16 +1,16 @@
-name: OpenList-magisk Release
+name: OpenList-Magisk Release
 
 on:
   workflow_dispatch:
 
 env:
-  REPO_NAME: OpenList-magisk
+  REPO_NAME: OpenList-Magisk
 
 jobs:
   build:
     runs-on: ubuntu-22.04
     permissions:
-      contents: write          # 确保有写权限
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,25 +20,26 @@ jobs:
 
       - name: Generate release note
         run: |
-          cat <<'EOF' > ${{ env.REPO_NAME }}-release.txt
+          cat <<EOF > ${{ env.REPO_NAME }}-release.txt
           🌐 管理地址: http://0.0.0.0:5244
-          ⏱️ 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S")
+          ⏱️ 编译时间: $(date -d "${{ github.event.repository.updated_at }}" +"%Y-%m-%d %H:%M:%S")
           👤 用户名: admin
           🔑 密码: 请在 KsuWebUI 中自行修改
           EOF
 
-      - name: Create tag
-        id: tag
+      - name: Create/force tag
         run: |
-          TAG="v$(date +%Y%m%d-%H%M%S)"
-          git tag "$TAG"
-          git push origin "$TAG"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          TAG="${{ env.REPO_NAME }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG" || git tag "$TAG"
+          git push -f origin "$TAG"
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ env.REPO_NAME }}
+          name: ${{ env.REPO_NAME }}
           body_path: ${{ env.REPO_NAME }}-release.txt
           files: |
             ${{ env.REPO_NAME }}.zip
