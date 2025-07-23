@@ -1,8 +1,10 @@
 name: Release OpenList-magisk
+
 on:
   push:
     tags:
-      - "v*"          # 只有推送形如 v1.0.0 的 tag 时才触发
+      - "v*"
+  workflow_dispatch:   # ← 新增这一行，就有了手动构建按钮
 
 jobs:
   build:
