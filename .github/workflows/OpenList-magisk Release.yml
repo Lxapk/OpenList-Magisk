@@ -100,7 +100,11 @@ jobs:
           🌐 管理地址: http://0.0.0.0:5244
           📅 编译时间: $BEIJING_TIME
           👤 用户名: admin
-          🔑 密码: 在KsuWebUI设置
+          🔐 管理员密码设置方式
+             • KernelSU 用户：                  
+             在OpenList模块 → 打开 → KsuWebUI设置
+             • Magisk 用户：        
+             运行/data/adb/modules/OpenList/webui.sh
           🏷️ 版本号: $NEW_VERSION
           EOF
 
