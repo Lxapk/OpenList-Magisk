@@ -87,7 +87,7 @@ jobs:
             -x ".git*" \
             -x ".github/*" \
             -x "bin/README.md" \
-            -x "data/temp/README.md"
+            -x "data/README.md"
 
       - name: Generate release note
         run: |
