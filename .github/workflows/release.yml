@@ -1,39 +1,37 @@
-name: Release OpenList-magisk
+name: OpenList-magisk Release
 
 on:
-  workflow_dispatch:   # 仅手动触发
+  workflow_dispatch:
+
+env:
+  REPO_NAME: OpenList-magisk
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Zip
-        run: zip -r OpenList-magisk.zip OpenList-magisk/ -x "*.git*"
+        run: zip -r ${{ env.REPO_NAME }}.zip OpenList-magisk/ -x "*.git*"
 
       - name: Generate release note
         run: |
-          cat <<'EOF' > release-note.txt
-          🌐 管理地址: http://0.0.0.0:5244  
+          cat <<'EOF' > ${{ env.REPO_NAME }}-release.txt
+          🌐 管理地址: http://0.0.0.0:5244
           ⏱️ 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S")
           👤 用户名: admin
           🔑 密码: 请在 KsuWebUI 中自行修改
           EOF
 
-      # 手动触发时自动生成 tag
-      - name: Create tag
-        run: |
-          git tag manual-$(date +%Y%m%d-%H%M%S)
-          git push origin --tags
-
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: $(git describe --tags --abbrev=0)
+          tag_name: v$(date +%Y%m%d-%H%M%S)
+          body_path: ${{ env.REPO_NAME }}-release.txt
           files: |
-            OpenList-magisk.zip
-            release-note.txt
-          body_path: release-note.txt
+            ${{ env.REPO_NAME }}.zip
+            ${{ env.REPO_NAME }}-release.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
