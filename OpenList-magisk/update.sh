@@ -103,14 +103,14 @@ update_and_restart() {
     
     pkill -f 'openlist server' >/dev/null 2>&1
     
-    local timeout=3
+    local timeout=2
     local elapsed=0
     while pgrep -f 'openlist server' >/dev/null; do
         if [ $elapsed -ge $timeout ]; then
             pkill -9 -f 'openlist server' >/dev/null 2>&1
             break
         fi
-        sleep 1
+        sleep 3
         elapsed=$((elapsed + 1))
     done
 }
