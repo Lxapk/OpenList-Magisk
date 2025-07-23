@@ -82,18 +82,23 @@ jobs:
       - name: Zip artifacts
         run: |
           cd OpenList-magisk
-          zip -r ../${{ env.REPO_NAME }}-$NEW_VERSION.zip . -x ".git*" -x ".github/*"
+          # 排除指定的README.md文件和其他不必要文件
+          zip -r ../${{ env.REPO_NAME }}-$NEW_VERSION.zip . \
+            -x ".git*" \
+            -x ".github/*" \
+            -x "bin/README.md" \
+            -x "data/temp/README.md"
 
       - name: Generate release note
-       run: |
-         cat <<EOF > release_notes.txt
-         🚀 ${{ env.REPO_NAME }} $NEW_VERSION 发布
-         🌐 管理地址: http://0.0.0.0:5244
-         📅 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-         👤 用户名: admin
-         🔑 密码: 请在 KsuWebUI 中自行修改
-         🏷️ 版本号: $NEW_VERSION
-       EOF
+        run: |
+          cat <<EOF > release_notes.txt
+          🚀 ${{ env.REPO_NAME }} $NEW_VERSION 发布
+          🌐 管理地址: http://0.0.0.0:5244
+          📅 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          👤 用户名: admin
+          🔑 密码: 请在 KsuWebUI 中自行修改
+          🏷️ 版本号: $NEW_VERSION
+          EOF
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
