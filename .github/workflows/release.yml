@@ -1,1 +1,36 @@
-1
+name: Release OpenList-magisk
+on:
+  push:
+    tags:
+      - "v*"          # 只有推送形如 v1.0.0 的 tag 时才触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 打包
+      - name: Zip OpenList-magisk
+        run: |
+          zip -r OpenList-magisk.zip OpenList-magisk/ -x "*.git*"
+
+      # 生成说明
+      - name: Generate release note
+        run: |
+          cat <<'EOF' > release-note.txt
+          🌐 管理地址: http://0.0.0.0:5244  
+          ⏱️ 编译时间: ${{ github.event.head_commit.timestamp }}  
+          👤 用户名: admin  
+          🔑 密码: 请在 WebUI 中自行修改  
+
+      # 发布
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            OpenList-magisk.zip
+            release-note.txt
+          body_path: release-note.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
