@@ -9,6 +9,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write          # 确保有写权限
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,13 +27,19 @@ jobs:
           🔑 密码: 请在 KsuWebUI 中自行修改
           EOF
 
+      - name: Create tag
+        id: tag
+        run: |
+          TAG="v$(date +%Y%m%d-%H%M%S)"
+          git tag "$TAG"
+          git push origin "$TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v$(date +%Y%m%d-%H%M%S)
+          tag_name: ${{ steps.tag.outputs.tag }}
           body_path: ${{ env.REPO_NAME }}-release.txt
           files: |
             ${{ env.REPO_NAME }}.zip
             ${{ env.REPO_NAME }}-release.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
