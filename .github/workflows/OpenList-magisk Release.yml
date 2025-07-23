@@ -63,8 +63,9 @@ jobs:
           # 保存新版本到环境变量
           echo "新版本: $NEW_VERSION"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          echo "::set-output name=new_version::$NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
+      # 后续步骤保持不变...
       - name: Update version file
         run: |
           echo "$NEW_VERSION" > $VERSION_FILE
