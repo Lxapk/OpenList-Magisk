@@ -24,7 +24,14 @@ stop_once() {
 }
 
 get_local_ip() {
-    ip=$(ifconfig wlan0 2>/dev/null | grep "inet addr" | awk '{print $2}' | awk -F ':' '{print $2}')
+    local ip=""
+    if command -v ip >/dev/null 2>&1; then
+        ip=$(ip -o -4 addr show wlan0 2>/dev/null | awk '{print $4}' | cut -d'/' -f1)
+    fi
+    if [ -z "$ip" ] && command -v ifconfig >/dev/null 2>&1; then
+        ip=$(ifconfig wlan0 2>/dev/null | awk '/inet / {print $2}' | sed 's/.*://')
+    fi
+    
     [ -z "$ip" ] && ip="未获取到"
     echo "$ip"
 }
