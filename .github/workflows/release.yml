@@ -1,10 +1,7 @@
 name: Release OpenList-magisk
 
 on:
-  push:
-    tags:
-      - "v*"
-  workflow_dispatch:   # ← 新增这一行，就有了手动构建按钮
+  workflow_dispatch:   # 仅手动触发
 
 jobs:
   build:
@@ -12,24 +9,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 打包
-      - name: Zip OpenList-magisk
-        run: |
-          zip -r OpenList-magisk.zip OpenList-magisk/ -x "*.git*"
+      - name: Zip
+        run: zip -r OpenList-magisk.zip OpenList-magisk/ -x "*.git*"
 
-      # 生成说明
       - name: Generate release note
         run: |
           cat <<'EOF' > release-note.txt
           🌐 管理地址: http://0.0.0.0:5244  
-          ⏱️ 编译时间: ${{ github.event.head_commit.timestamp }}  
-          👤 用户名: admin  
-          🔑 密码: 请在 WebUI 中自行修改  
+          ⏱️ 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S")
+          👤 用户名: admin
+          🔑 密码: 请在 KsuWebUI 自行修改
 
-      # 发布
+      # 手动触发时自动生成 tag
+      - name: Create tag
+        run: |
+          git tag manual-$(date +%Y%m%d-%H%M%S)
+          git push origin --tags
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: $(git describe --tags --abbrev=0)
           files: |
             OpenList-magisk.zip
             release-note.txt
