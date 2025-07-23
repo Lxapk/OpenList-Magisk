@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenList 管理控制台</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>OpenList 管理控制台</h1>
+    <p>
+      乐享网: 
+      <a href="https://www.lxapk.com" target="_blank">www.lxapk.com</a>
+    </p>
+
+    <div class="section">
+      <h2>服务状态</h2>
+      <div id="status" class="status loading">
+        <p>
+          <strong>OpenList 服务:</strong>
+          <span id="openlistStatus">加载中...</span>
+        </p>
+        <p>
+          <strong>自动更新服务:</strong>
+          <span id="updateStatus">加载中...</span>
+        </p>
+        <p>
+          <strong>当前版本:</strong>
+          <span id="versionStatus">加载中...</span>
+        </p>
+        <p>
+          <strong>设备 IP:</strong>
+          <span id="ipStatus">加载中...</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>手动更新</h2>
+      <button id="updateBtn" class="btn update-btn">
+        开始更新
+      </button>
+      <div id="updateLog" class="log">
+        <p>📢 点击"开始更新"后，日志将在此显示。</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>设置管理员密码</h2>
+      <input
+        id="password"
+        type="password"
+        class="input"
+        placeholder="请输入新密码"
+      >
+      <input
+        id="confirmPassword"
+        type="password"
+        class="input"
+        placeholder="请再次输入新密码"
+      >
+      <button id="setPasswordBtn" class="btn btn-success">
+        设置密码
+      </button>
+    </div>
+
+    <p>懂得自己无知 ▪ 说明已有收获</p>
+  </div>
+
+  <div id="spinner" class="spinner hidden">
+    <div class="spinner-inner"></div>
+  </div>
+
+  <script src="assets/script.js"></script>
+</body>
+</html>
