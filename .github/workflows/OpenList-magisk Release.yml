@@ -91,12 +91,15 @@ jobs:
 
       - name: Generate release note
         run: |
+          # 获取北京时间（CST，UTC+8）
+          BEIJING_TIME=$(TZ='Asia/Shanghai' date +"%Y-%m-%d %H:%M:%S")
+          
           cat <<EOF > release_notes.txt
           🚀 ${{ env.REPO_NAME }} $NEW_VERSION 发布
           🌐 管理地址: http://0.0.0.0:5244
-          📅 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          📅 编译时间: $BEIJING_TIME
           👤 用户名: admin
-          🔑 密码: 请在 KsuWebUI 中自行修改
+          🔑 密码: 在KsuWebUI设置
           🏷️ 版本号: $NEW_VERSION
           EOF
 
