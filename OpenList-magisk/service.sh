@@ -2,6 +2,8 @@
 
 MODDIR="$(dirname "$(readlink -f "$0")")"
 
+mkdir -p "$MODDIR/data"
+chmod 755 "$MODDIR/data"
 chmod 755 "$MODDIR"/bin/openlist
 chmod 755 "$MODDIR"/*.sh
 
