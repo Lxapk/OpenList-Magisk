@@ -85,15 +85,15 @@ jobs:
           zip -r ../${{ env.REPO_NAME }}-$NEW_VERSION.zip . -x ".git*" -x ".github/*"
 
       - name: Generate release note
-        run: |
-          cat <<EOF > release_notes.txt
-          🚀 ${{ env.REPO_NAME }} $NEW_VERSION 发布
-          🌐 管理地址: http://0.0.0.0:5244
-          📅 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          👤 用户名: admin
-          🔑 密码: 请在 KsuWebUI 中自行修改
-          ⬆️ 版本更新: ${{ github.event.inputs.version_bump }} 级别更新
-          EOF
+       run: |
+         cat <<EOF > release_notes.txt
+         🚀 ${{ env.REPO_NAME }} $NEW_VERSION 发布
+         🌐 管理地址: http://0.0.0.0:5244
+         📅 编译时间: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+         👤 用户名: admin
+         🔑 密码: 请在 KsuWebUI 中自行修改
+         🏷️ 版本号: $NEW_VERSION
+       EOF
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
