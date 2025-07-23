@@ -14,7 +14,7 @@
 - 本地版本落后 → 自动下载 → 平滑替换 → 无感重启  
 - 版本一致 → 零打扰
 
-## 🛠 Magisk 开关  
+## 🛠 兼容Magisk  
 提供 `control.sh`，实时查询模块启用状态，与 Magisk Manager 完美配合。
 
 ## 🚀 KernelSU 专属增强  
