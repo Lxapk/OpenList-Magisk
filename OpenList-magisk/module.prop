@@ -3,4 +3,4 @@ name=OpenList
 version=v
 versionCode=500
 author=BlackHawk[支持KusWebUI功能]
-description=
+description=支持管理员密码设置、运行状态和IP查询、数据备份与恢复
