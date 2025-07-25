@@ -13,17 +13,18 @@
 
 ## 🔄 智能更新  
 内置 `update.sh`，每 3 小时静默检查 GitHub Releases：  
-- 本地版本落后 → 自动下载 → 平滑替换 → 无感重启  
-- 版本一致 → 零打扰
+
 
 ## 🛠 兼容Magisk  
-提供 `control.sh`，实时查询模块启用状态，与 Magisk Manager 完美配合。
+提供 `control.sh`，实时查询模块启用状态
+Webui.sh脚本与 Magisk Manager 完美配合。
 
 ## 🚀 KernelSU 专属增强  
-针对 KernelSU 深度适配 KsuWebUI：  
-- 首页可视化运行状态  
-- 一键手动升级  
-- 在线修改管理员密码，告别命令行
+深度适配 KsuWebUI
+首页可视化运行状态
+支持数据备份与恢复
+一键手动升级，支持亮色/暗色主题
+在线修改管理员密码，告别命令行
 
 ---
 
