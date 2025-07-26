@@ -32,28 +32,26 @@ function showToast(msg) {
 async function getIpPort() {
     let ip = null;
     try {
-        const { stdout } = await execCommand('ip -o -4 addr show');
-        const match = stdout.match(/^[^:]+:\s+inet\s+(\S+)(?:\s|$)/m);
-        if (match) {
-            const addr = match[1].split('/')[0];
-            if (addr !== '127.0.0.1') ip = addr;
-        }
+        const { stdout } = await execCommand(
+            'ip -o -4 addr show 2>/dev/null | awk -F"[ /]+" \'/inet / && $4 != "127.0.0.1" {print $4; exit}\'',
+        );
+        ip = stdout.trim();
     } catch (_) {}
-
     if (!ip) {
         try {
-            const { stdout } = await execCommand('ip route get 1');
-            const m = stdout.match(/\bsrc\s+(\S+)/);
-            if (m) ip = m[1];
+            const { stdout } = await execCommand(
+                'ip route get 1 2>/dev/null | awk -F"src " \'/src / {print $2; exit}\'',
+            );
+            ip = stdout.trim();
         } catch (_) {}
     }
-
     if (!ip) ip = '127.0.0.1';
+
     let port = null;
     const cfgPath = '/data/adb/modules/OpenList/data/config.json';
     try {
         const { stdout } = await execCommand(
-            `awk -F'[:"[:space:]]+' '/"http_port"/ {print $3}' "${cfgPath}" 2>/dev/null | tr -d ', '`
+            `awk -F'[:"[:space:]]+' '/"http_port"/ {print $3}' "${cfgPath}" 2>/dev/null | tr -d ', '`,
         );
         port = stdout.trim() || null;
     } catch (_) {}
@@ -64,29 +62,22 @@ async function getIpPort() {
 
 async function getStatus(isInitial = false) {
     const openlistSpan = document.getElementById('openlistStatus');
-    const updateSpan = document.getElementById('updateStatus');
     const versionSpan = document.getElementById('versionStatus');
     const ipStatusSpan = document.getElementById('ipStatus');
 
     if (isInitial) showSpinner(true);
-
     try {
-        const [r1, r2, r3] = await Promise.all([
+        const [r1, r2] = await Promise.all([
             execCommand('pgrep -f /data/adb/modules/OpenList/bin/openlist').catch(() => ({ errno: -1 })),
-            execCommand('pgrep -f /data/adb/modules/OpenList/update.sh').catch(() => ({ errno: -1 })),
-            execCommand('/data/adb/modules/OpenList/bin/openlist version').catch(() => ({ stdout: '' }))
+            execCommand('/data/adb/modules/OpenList/bin/openlist version').catch(() => ({ stdout: '' })),
         ]);
 
         const runningOpen = r1.errno === 0;
-        const runningUpd = r2.errno === 0;
-        const version = (r3.stdout.match(/^Version: (.*)$/m) || [])[1] || '未安装';
+        const version = (r2.stdout.match(/^Version: (.*)$/m) || [])[1] || '未安装';
         const ipPort = await getIpPort();
 
         openlistSpan.textContent = runningOpen ? '运行中 ✓' : '已停止 ✗';
         openlistSpan.className = runningOpen ? 'text-success' : 'text-error';
-
-        updateSpan.textContent = runningUpd ? '运行中 ✓' : '已停止 ✗';
-        updateSpan.className = runningUpd ? 'text-success' : 'text-error';
 
         versionSpan.textContent = version;
         versionSpan.className = 'text-info';
@@ -100,21 +91,82 @@ async function getStatus(isInitial = false) {
     }
 }
 
+async function checkVersions() {
+    const updateLog = document.getElementById('updateLog');
+    const versionSelect = document.getElementById('versionSelect');
+    showSpinner(true);
+    updateLog.innerHTML = '<p>⏳ 正在检查版本...</p>';
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        const latestResponse = await fetch('https://api.github.com/repos/OpenListTeam/OpenList/releases/latest', {
+            headers: { Accept: 'application/vnd.github.v3+json' },
+            signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        if (!latestResponse.ok) throw new Error(`GitHub API 请求失败: ${latestResponse.status}`);
+        const latestData = await latestResponse.json();
+        const latestVersion = latestData.tag_name;
+
+        const allResponse = await fetch('https://api.github.com/repos/OpenListTeam/OpenList/releases', {
+            headers: { Accept: 'application/vnd.github.v3+json' },
+            signal: controller.signal,
+        });
+        if (!allResponse.ok) throw new Error(`GitHub API 请求失败: ${allResponse.status}`);
+        const allData = await allResponse.json();
+        const versions = allData.map(release => release.tag_name);
+
+        versionSelect.innerHTML = '';
+        const latestOption = document.createElement('option');
+        latestOption.value = latestVersion;
+        latestOption.textContent = `${latestVersion} (最新稳定版)`;
+        versionSelect.appendChild(latestOption);
+
+        versions
+            .filter(v => v !== latestVersion)
+            .sort((a, b) => b.localeCompare(a))
+            .slice(0, 7)
+            .forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v;
+                opt.textContent = v;
+                versionSelect.appendChild(opt);
+            });
+
+        versionSelect.value = latestVersion;
+        updateLog.innerHTML = `<p>✅ 最新稳定版: ${latestVersion}</p>`;
+        showToast('版本检查完成');
+    } catch (e) {
+        updateLog.innerHTML = `<p>❌ 版本检查失败: ${e.message}</p>`;
+        showToast('版本检查失败: ' + e.message);
+    } finally {
+        showSpinner(false);
+    }
+}
+
 async function startUpdate() {
     const updateBtn = document.getElementById('updateBtn');
     const updateLog = document.getElementById('updateLog');
+    const versionSelect = document.getElementById('versionSelect');
+    const selectedVersion = versionSelect.value;
+
+    if (!selectedVersion) {
+        showToast('请先检查版本以选择更新版本');
+        return;
+    }
 
     updateBtn.disabled = true;
-    updateLog.innerHTML = '<p>⏳ 正在检测更新，请稍后...</p>';
-
+    updateLog.innerHTML = `<p>⏳ 正在更新到 ${selectedVersion}，请稍后...</p>`;
     await new Promise(r => requestAnimationFrame(r));
     await new Promise(r => setTimeout(r, 0));
 
     showSpinner(true);
-    showToast('开始更新...');
-
+    showToast(`开始更新到 ${selectedVersion}...`);
     try {
-        const res = await execCommand('sh /data/adb/modules/OpenList/update.sh manual-update');
+        const res = await execCommand(
+            `sh /data/adb/modules/OpenList/update.sh manual-update "${selectedVersion}"`,
+        );
         const lines = res.stdout.split('\n').filter(l => l.trim());
 
         updateLog.innerHTML = '';
@@ -129,7 +181,10 @@ async function startUpdate() {
             updateLog.scrollTop = updateLog.scrollHeight;
         }
 
-        showToast(res.errno === 0 ? '更新完成' : '更新失败');
+        if (res.errno !== 0) {
+            throw new Error(res.stderr || res.stdout || '更新失败');
+        }
+        showToast('更新完成');
     } catch (e) {
         updateLog.innerHTML = `<p>❌ 更新失败: ${e.message}</p>`;
         showToast('更新失败: ' + e.message);
@@ -153,14 +208,17 @@ async function setPassword() {
         showToast('两次输入的密码不一致');
         return;
     }
+    if (pwd.length < 6 || pwd.length > 32) {
+        showToast('密码长度需在 6-32 位之间');
+        return;
+    }
 
     btn.disabled = true;
     showSpinner(true);
-
     try {
         const b64 = btoa(pwd);
         const res = await execCommand(
-            `sh /data/adb/modules/OpenList/update.sh set-password-base64 "${b64}"`
+            `sh /data/adb/modules/OpenList/update.sh set-password-base64 "${b64}"`,
         );
         if (res.errno === 0) {
             showToast('密码设置成功');
@@ -183,19 +241,25 @@ async function backupData() {
     btn.disabled = true;
     showSpinner(true);
     log.innerHTML = '<p>🔄 正在创建数据备份...</p>';
-
     try {
-        const timestamp = new Date().toLocaleString('zh-CN', {
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
-            hour12: false
-        }).replace(/\D/g, '').replace(/(\d{4})(\d{2})(\d{2})(\d{6})/, '$1$2$3-$4');
+        const timestamp = new Date()
+            .toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            })
+            .replace(/\D/g, '')
+            .replace(/(\d{4})(\d{2})(\d{2})(\d{6})/, '$1$2$3-$4');
         const backupName = `OpenList-backup-${timestamp}.tar.gz`;
         const backupPath = `/sdcard/OpenList/backups/${backupName}`;
 
         await execCommand('mkdir -p /sdcard/OpenList/backups');
         const res = await execCommand(
-            `tar --exclude='data/temp' --exclude='data/log' -czf "${backupPath}" -C /data/adb/modules/OpenList data 2>&1`
+            `tar --exclude='data/temp' --exclude='data/log' -czf "${backupPath}" -C /data/adb/modules/OpenList data 2>&1`,
         );
 
         if (res.errno === 0) {
@@ -222,7 +286,7 @@ async function refreshBackupList() {
     sel.innerHTML = '<option value="">加载中…</option>';
     try {
         const { stdout } = await execCommand(
-            'ls -1 /sdcard/OpenList/backups/*.tar.gz 2>/dev/null || true'
+            'ls -1 /sdcard/OpenList/backups/*.tar.gz 2>/dev/null || true',
         );
         const files = stdout.trim().split('\n').filter(f => f);
         sel.innerHTML = '';
@@ -259,9 +323,7 @@ async function restoreData() {
         await execCommand('pkill -9 -f /data/adb/modules/OpenList/bin/openlist');
 
         log.innerHTML += '<p>🔄 正在恢复数据...</p>';
-        const res = await execCommand(
-            `tar -xzf "${backupPath}" -C /data/adb/modules/OpenList 2>&1`
-        );
+        const res = await execCommand(`tar -xzf "${backupPath}" -C /data/adb/modules/OpenList 2>&1`);
         if (res.errno !== 0) throw new Error(res.stderr || res.stdout);
 
         log.innerHTML += '<p>✅ 数据恢复完成...</p>';
@@ -280,12 +342,14 @@ async function restoreData() {
 async function initTheme() {
     try {
         const { stdout } = await execCommand(
-            'grep "^theme=" /data/adb/modules/OpenList/data/theme.conf 2>/dev/null || echo "theme=light"'
+            'grep "^theme=" /data/adb/modules/OpenList/data/theme.conf 2>/dev/null || echo "theme=light"',
         );
         const theme = stdout.trim().split('=')[1] || 'light';
         document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('openlist-theme', theme);
     } catch (e) {
         document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('openlist-theme', 'light');
     }
 }
 
@@ -295,6 +359,7 @@ async function toggleTheme() {
         const next = current === 'light' ? 'dark' : 'light';
 
         document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('openlist-theme', next);
         await execCommand(`echo "theme=${next}" > /data/adb/modules/OpenList/data/theme.conf`);
         showToast(`已切换到${next === 'dark' ? '深色' : '浅色'}主题`);
     } catch (e) {
@@ -305,14 +370,17 @@ async function toggleTheme() {
 function initialize() {
     initTheme();
     document.getElementById('updateBtn').addEventListener('click', startUpdate);
+    document.getElementById('checkVersionBtn').addEventListener('click', checkVersions);
     document.getElementById('setPasswordBtn').addEventListener('click', setPassword);
     document.getElementById('backupBtn').addEventListener('click', backupData);
     document.getElementById('restoreBtn').addEventListener('click', restoreData);
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
     if (typeof ksu === 'undefined' || !ksu.exec) {
-        document.getElementById('status').innerHTML = '<p class="text-error">KsuWebUI 未加载，请检查 KernelSU 环境</p>';
+        document.getElementById('status').innerHTML =
+            '<p class="text-error">KsuWebUI 未加载，请检查 KernelSU 环境</p>';
         document.getElementById('updateBtn').disabled = true;
+        document.getElementById('checkVersionBtn').disabled = true;
         document.getElementById('setPasswordBtn').disabled = true;
         document.getElementById('backupBtn').disabled = true;
         document.getElementById('restoreBtn').disabled = true;
