@@ -18,5 +18,4 @@ elif [ -e /sys/power/wakeup_count ]; then
 fi
 
 "$MODDIR/bin/openlist" server --data "$MODDIR/data" > /dev/null 2>&1 &
-sh "$MODDIR/update.sh" > /dev/null 2>&1 &
 sh "$MODDIR/control.sh" > /dev/null 2>&1 &

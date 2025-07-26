@@ -8,6 +8,18 @@ YELLOW='\033[0;93m'
 RED='\033[0;91m'
 NC='\033[0m'
 
+find_busybox() {
+    for path in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox; do
+        [ -f "$path" ] && {
+            BUSYBOX="$path"
+            return 0
+        }
+    done
+    BUSYBOX="busybox"
+    return 1
+}
+find_busybox
+
 print_header() {
     clear
     printf "${GREEN}╭──────────────────────────────╮\n"
@@ -34,11 +46,84 @@ print_progress() {
     printf "] ${percent}%%${NC}"
 }
 
+get_versions() {
+    printf "\n${BLUE}▶ 正在获取版本列表...${NC}\n"
+    
+    tmpfile="$MODDIR/versions_tmp.log"
+    > "$tmpfile"
+    
+    RELEASES_URL="https://api.github.com/repos/OpenListTeam/OpenList/releases"
+    versions=$(
+        "$BUSYBOX" wget -q --no-check-certificate -O - "$RELEASES_URL" 2>/dev/null |
+        grep -o '"tag_name": "[^"]*"' |
+        sed 's/"tag_name": "//;s/"//g' |
+        sort -uVr |
+        head -n 8
+    )
+    
+    if [ -z "$versions" ]; then
+        printf "${RED}✗ 无法获取版本列表，请检查网络连接${NC}\n"
+        echo "无法获取版本列表" > "$tmpfile"
+        return 1
+    fi
+    
+    echo "$versions" > "$tmpfile"
+    VERSIONS_ARRAY=()
+    i=1
+    while IFS= read -r version; do
+        VERSIONS_ARRAY[$i]="$version"
+        if [ $i -eq 1 ]; then
+            printf "${GREEN}%2d. %s (最新稳定版)${NC}\n" $i "$version"
+        else
+            printf "${BLUE}%2d. %s${NC}\n" $i "$version"
+        fi
+        i=$((i + 1))
+    done < "$tmpfile"
+    
+    array_length=$((i - 1))
+    if [ "$array_length" -eq 0 ]; then
+        printf "${RED}✗ 版本列表为空${NC}\n"
+        rm -f "$tmpfile"
+        return 1
+    fi
+    
+    printf "\n${GREEN}请输入要更新的版本号 (0-%d, 0取消): ${NC}" "$array_length"
+    read choice
+    
+    case "$choice" in
+        ''|*[!0-9]*)
+            printf "${RED}✗ 请输入有效的数字${NC}\n"
+            rm -f "$tmpfile"
+            return 1
+            ;;
+        *)
+            if [ "$choice" -eq 0 ]; then
+                printf "${YELLOW}▶ 已取消更新${NC}\n"
+                rm -f "$tmpfile"
+                return 1
+            elif [ "$choice" -le "$array_length" ] && [ "$choice" -ge 1 ]; then
+                TARGET_VERSION="${VERSIONS_ARRAY[$choice]}"
+                printf "${GREEN}▶ 已选择版本: ${YELLOW}%s${NC}\n" "$TARGET_VERSION"
+                rm -f "$tmpfile"
+                return 0
+            else
+                printf "${RED}✗ 无效的选择，请输入 0-%d 之间的数字${NC}\n" "$array_length"
+                rm -f "$tmpfile"
+                return 1
+            fi
+            ;;
+    esac
+}
+
 manual_update() {
-    printf "\n${BLUE}▶ 正在启动手动更新...${NC}\n"
+    if ! get_versions; then
+        return 1
+    fi
+
+    printf "\n${BLUE}▶ 正在启动手动更新到 ${YELLOW}%s${BLUE}...${NC}\n" "$TARGET_VERSION"
     tmpfile="$MODDIR/update_tmp.log"
     > "$tmpfile"
-    sh "$MODDIR/update.sh" manual-update > "$tmpfile" 2>&1 &
+    sh "$MODDIR/update.sh" manual-update "$TARGET_VERSION" > "$tmpfile" 2>&1 &
     pid=$!
 
     while kill -0 $pid 2>/dev/null; do
@@ -208,12 +293,6 @@ while true; do
                 printf " OpenList 服务: ${GREEN}运行中 ✓${NC}\n"
             else
                 printf " OpenList 服务: ${RED}已停止 ✗${NC}\n"
-            fi
-
-            if pgrep -f 'update.sh' >/dev/null; then
-                printf " 自动更新服务: ${GREEN}运行中 ✓${NC}\n"
-            else
-                printf " 自动更新服务: ${RED}已停止 ✗${NC}\n"
             fi
 
             if [ -x "${MODDIR}/bin/openlist" ]; then
