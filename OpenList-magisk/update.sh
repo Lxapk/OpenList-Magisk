@@ -61,6 +61,12 @@ download_and_extract() {
   OpenList_file="openlist-android-${ARCH}.tar.gz"
   TEMP_DIR=$(prepare_temp_dir) || return 1
 
+  if ! "${BUSYBOX}" wget -q --timeout=5 --spider https://github.com 2>/dev/null; then
+    echo "[$(date "+%Y-%m-%d %H:%M:%S")] 无法访问 GitHub，请检查网络或代理" >>"${MODDIR}/log.log"
+    rm -rf "${TEMP_DIR}" 2>/dev/null
+    return 1
+  fi
+
   echo "[$(date "+%Y-%m-%d %H:%M:%S")] 开始下载: ${target_version}" >>"${MODDIR}/log.log"
   echo "开始下载: ${target_version}"
 
@@ -180,8 +186,14 @@ update_and_restart() {
 
 check_update() {
   local target_version="$1"
+
   echo "[$(date "+%Y-%m-%d %H:%M:%S")] === 开始检查更新 ===" >>"${MODDIR}/log.log"
   echo "=== 开始检查更新 ==="
+
+  if ! "${BUSYBOX}" wget -q --timeout=5 --spider https://github.com 2>/dev/null; then
+    echo "[$(date "+%Y-%m-%d %H:%M:%S")] 无法访问 GitHub，请检查网络或代理" >>"${MODDIR}/log.log"
+    return 1
+  fi
 
   current_version=$(get_version)
   echo "[$(date "+%Y-%m-%d %H:%M:%S")] 目标版本: ${target_version}" >>"${MODDIR}/log.log"
