@@ -96,24 +96,52 @@ async function checkVersions() {
     const versionSelect = document.getElementById('versionSelect');
     showSpinner(true);
     updateLog.innerHTML = '<p>⏳ 正在检查版本...</p>';
+
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            await fetch('https://api.github.com', {
+                method: 'HEAD',
+                signal: controller.signal,
+                cache: 'no-store'
+            });
+            
+            clearTimeout(timeoutId);
+        } catch (e) {
+            throw new Error('无法访问 GitHub，请检查网络或代理');
+        }
+
+        const latestController = new AbortController();
+        const latestTimeout = setTimeout(() => latestController.abort(), 10000);
 
         const latestResponse = await fetch('https://api.github.com/repos/OpenListTeam/OpenList/releases/latest', {
             headers: { Accept: 'application/vnd.github.v3+json' },
-            signal: controller.signal,
+            signal: latestController.signal,
         });
-        clearTimeout(timeoutId);
-        if (!latestResponse.ok) throw new Error(`GitHub API 请求失败: ${latestResponse.status}`);
+        clearTimeout(latestTimeout);
+
+        if (!latestResponse.ok) {
+            throw new Error('GitHub API 请求失败');
+        }
+
         const latestData = await latestResponse.json();
         const latestVersion = latestData.tag_name;
+        
+        const allController = new AbortController();
+        const allTimeout = setTimeout(() => allController.abort(), 10000);
 
         const allResponse = await fetch('https://api.github.com/repos/OpenListTeam/OpenList/releases', {
             headers: { Accept: 'application/vnd.github.v3+json' },
-            signal: controller.signal,
+            signal: allController.signal,
         });
-        if (!allResponse.ok) throw new Error(`GitHub API 请求失败: ${allResponse.status}`);
+        clearTimeout(allTimeout);
+
+        if (!allResponse.ok) {
+            throw new Error('GitHub API 请求失败');
+        }
+
         const allData = await allResponse.json();
         const versions = allData.map(release => release.tag_name);
 
@@ -138,8 +166,8 @@ async function checkVersions() {
         updateLog.innerHTML = `<p>✅ 最新稳定版: ${latestVersion}</p>`;
         showToast('版本检查完成');
     } catch (e) {
-        updateLog.innerHTML = `<p>❌ 版本检查失败: ${e.message}</p>`;
-        showToast('版本检查失败: ' + e.message);
+        updateLog.innerHTML = `<p>❌ ${e.message}</p>`;
+        showToast(e.message);
     } finally {
         showSpinner(false);
     }
@@ -167,26 +195,37 @@ async function startUpdate() {
         const res = await execCommand(
             `sh /data/adb/modules/OpenList/update.sh manual-update "${selectedVersion}"`,
         );
-        const lines = res.stdout.split('\n').filter(l => l.trim());
-
         updateLog.innerHTML = '';
+        const lines = (res.stdout + '\n' + res.stderr).split('\n').filter(l => l.trim());
+
         if (!lines.length) {
             updateLog.innerHTML = '<p>⚠️ 无更新日志</p>';
         } else {
             lines.forEach(l => {
                 const p = document.createElement('p');
                 p.textContent = l;
+                if (l.includes('失败')) {
+                    p.className = 'text-error';
+                } else if (l.includes('成功')) {
+                    p.className = 'text-success';
+                } else {
+                    p.className = 'text-info';
+                }
                 updateLog.appendChild(p);
             });
             updateLog.scrollTop = updateLog.scrollHeight;
         }
 
         if (res.errno !== 0) {
-            throw new Error(res.stderr || res.stdout || '更新失败');
+            throw new Error('请检查网络或代理');
         }
         showToast('更新完成');
     } catch (e) {
-        updateLog.innerHTML = `<p>❌ 更新失败: ${e.message}</p>`;
+        const p = document.createElement('p');
+        p.textContent = `❌ 更新失败: ${e.message}`;
+        p.className = 'text-error';
+        updateLog.appendChild(p);
+        updateLog.scrollTop = updateLog.scrollHeight;
         showToast('更新失败: ' + e.message);
     } finally {
         updateBtn.disabled = false;
