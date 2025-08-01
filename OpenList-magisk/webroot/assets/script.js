@@ -1,4 +1,3 @@
-// 执行命令的核心函数
 function execCommand(cmd) {
     return new Promise((resolve, reject) => {
         if (typeof ksu === 'undefined' || !ksu.exec) {
@@ -20,13 +19,11 @@ function execCommand(cmd) {
     });
 }
 
-// 显示/隐藏加载动画
 function showSpinner(show) {
     const spinner = document.getElementById('spinner');
     if (spinner) spinner.classList.toggle('hidden', !show);
 }
 
-// 显示提示信息
 function showToast(msg) {
     console.log('Showing toast:', msg);
     if (typeof ksu !== 'undefined' && ksu.toast) {
@@ -36,7 +33,6 @@ function showToast(msg) {
     }
 }
 
-// 获取IP和端口
 async function getIpPort() {
     let ip = null;
     try {
@@ -74,7 +70,6 @@ async function getIpPort() {
     return `${ip}:${port}`;
 }
 
-// 获取服务状态
 async function getStatus(isInitial = false) {
     const openlistSpan = document.getElementById('openlistStatus');
     const versionSpan = document.getElementById('versionStatus');
@@ -127,7 +122,6 @@ async function getStatus(isInitial = false) {
     }
 }
 
-// 检查版本更新
 async function checkVersions() {
     const updateLog = document.getElementById('updateLog');
     const versionSelect = document.getElementById('versionSelect');
@@ -206,7 +200,6 @@ async function checkVersions() {
     }
 }
 
-// 开始更新
 async function startUpdate() {
     const updateBtn = document.getElementById('updateBtn');
     const updateLog = document.getElementById('updateLog');
@@ -262,7 +255,6 @@ async function startUpdate() {
     }
 }
 
-// 设置密码
 async function setPassword() {
     const pwd = document.getElementById('password').value;
     const cpwd = document.getElementById('confirmPassword').value;
@@ -303,7 +295,6 @@ async function setPassword() {
     }
 }
 
-// 备份数据
 async function backupData() {
     const log = document.getElementById('backupLog');
     const btn = document.getElementById('backupBtn');
@@ -350,7 +341,6 @@ async function backupData() {
     }
 }
 
-// 刷新备份列表
 async function refreshBackupList() {
     const sel = document.getElementById('backupSelect');
     if (!sel) return;
@@ -376,7 +366,6 @@ async function refreshBackupList() {
     }
 }
 
-// 恢复数据
 async function restoreData() {
     const backupPath = document.getElementById('backupSelect').value;
     if (!backupPath) {
@@ -411,7 +400,6 @@ async function restoreData() {
     }
 }
 
-// 刷新日志列表
 async function refreshLogList() {
     const sel = document.getElementById('logSelect');
     if (!sel) return;
@@ -436,7 +424,6 @@ async function refreshLogList() {
     }
 }
 
-// 加载日志内容
 async function loadLogContent() {
     const logPath = document.getElementById('logSelect').value;
     const logContent = document.getElementById('logContent');
@@ -469,7 +456,6 @@ async function loadLogContent() {
     }
 }
 
-// 清空日志
 async function clearLog() {
     const logPath = document.getElementById('logSelect').value;
     const logContent = document.getElementById('logContent');
@@ -501,7 +487,6 @@ async function clearLog() {
     }
 }
 
-// 初始化主题
 async function initTheme() {
     try {
         const { stdout } = await execCommand(
@@ -516,7 +501,6 @@ async function initTheme() {
     }
 }
 
-// 切换主题
 async function toggleTheme() {
     try {
         const current = document.documentElement.getAttribute('data-theme') || 'light';
@@ -526,9 +510,8 @@ async function toggleTheme() {
         await execCommand(`echo "theme=${next}" > /data/adb/modules/OpenList/data/theme.conf`);
         showToast(`已切换到${next === 'dark' ? '深色' : '浅色'}主题`);
         
-        // 强制重绘以确保主题立即生效
         requestAnimationFrame(() => {
-            document.body.offsetHeight; // 触发重排
+            document.body.offsetHeight;
             document.querySelectorAll('.status-card, .feature-card, .header-bg, .theme-toggle').forEach(el => {
                 el.style.transition = 'all 0.3s ease';
                 el.style.background = getComputedStyle(document.documentElement).getPropertyValue('--card-bg');
@@ -541,7 +524,6 @@ async function toggleTheme() {
     }
 }
 
-// 页面导航
 function navigate(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelector(`.page[data-page="${page}"]`).classList.add('active');
@@ -549,7 +531,6 @@ function navigate(page) {
     if (page === 'log') refreshLogList();
 }
 
-// 初始化应用
 function initialize() {
     console.log('Initializing theme and event listeners...');
     initTheme();
