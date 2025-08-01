@@ -237,6 +237,12 @@ body {
     margin-right: 0.75rem;
 }
 
+.status-value.running,
+.status-value.stopped {
+    color: var(--info);
+    font-size: 1rem;
+}
+
 .status-value.running .indicator {
     background: #4ade80;
 }
