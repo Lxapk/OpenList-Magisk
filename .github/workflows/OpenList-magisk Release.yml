@@ -52,7 +52,11 @@ jobs:
               NEW_VERSION="v${MAJOR}.$((MINOR + 1)).0"
               ;;
             patch)
-              NEW_VERSION="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+              if [ "$PATCH" -eq 9 ]; then
+                NEW_VERSION="v${MAJOR}.$((MINOR + 1)).0"
+              else
+                NEW_VERSION="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+              fi
               ;;
             *)
               echo "无效的版本更新类型: $BUMP_TYPE"
@@ -65,7 +69,6 @@ jobs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      # 后续步骤保持不变...
       - name: Update version file
         run: |
           echo "$NEW_VERSION" > $VERSION_FILE
