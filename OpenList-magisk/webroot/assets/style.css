@@ -19,6 +19,10 @@ body {
     padding: 1.5rem 1rem;
     transition: var(--transition);
     will-change: background-color, color;
+    padding-top: calc(1.5rem + env(safe-area-inset-top));
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    padding-left: calc(1rem + env(safe-area-inset-left));
+    padding-right: calc(1rem + env(safe-area-inset-right));
 }
 
 :root {
@@ -201,10 +205,10 @@ body {
 }
 
 .status-item {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: auto 1fr;
     align-items: center;
-    justify-content: space-between;
+    column-gap: 0.5rem;
     width: 100%;
     padding: 0.25rem 0;
 }
@@ -213,8 +217,6 @@ body {
     font-size: 1rem;
     font-weight: 500;
     color: var(--text-secondary);
-    width: 8rem;
-    flex-shrink: 0;
     text-align: left;
 }
 
@@ -228,6 +230,7 @@ body {
     flex: 1;
     color: var(--text-primary);
     padding-left: 1rem;
+    overflow-wrap: anywhere;
 }
 
 .status-value .indicator {
@@ -309,8 +312,7 @@ body {
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, auto);
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     gap: 1rem;
 }
 
@@ -512,6 +514,7 @@ select.input {
 .log {
     margin-top: 1rem;
     max-height: 18.75rem;
+    max-height: 50vh;
     overflow-y: auto;
     background: var(--card-bg);
     padding: 1rem;
@@ -599,7 +602,7 @@ select.input {
         padding: 0.2rem 0;
     }
     .status-label {
-        width: 7rem;
+        /* no fixed width on mobile */
     }
     .status-value {
         padding-left: 0.75rem;
@@ -622,6 +625,10 @@ select.input {
 @media (max-width: 480px) {
     body {
         padding: 1rem 0.75rem;
+        padding-top: calc(1rem + env(safe-area-inset-top));
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+        padding-left: calc(0.75rem + env(safe-area-inset-left));
+        padding-right: calc(0.75rem + env(safe-area-inset-right));
     }
     .title {
         font-size: 1.5rem;
@@ -638,7 +645,6 @@ select.input {
     }
     .status-label {
         font-size: 0.9375rem;
-        width: 6rem;
     }
     .status-value {
         font-size: 1rem;
@@ -651,6 +657,7 @@ select.input {
     }
     .features-grid {
         gap: 0.5rem;
+        grid-template-columns: 1fr;
     }
     .status-card,
     .feature-card {
