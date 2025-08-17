@@ -100,7 +100,7 @@ jobs:
           
           cat <<EOF > release_notes.txt
           🚀 ${{ env.REPO_NAME }} $NEW_VERSION 发布
-          🌐 管理地址: http://0.0.0.0:5244
+          🌐 管理地址: http://[ip]:5244
           📅 编译时间: $BEIJING_TIME
           👤 用户名: admin
           🔐 管理员密码设置方式
@@ -118,4 +118,4 @@ jobs:
           name: "${{ env.REPO_NAME }} ${{ env.NEW_VERSION }}"
           body_path: release_notes.txt
           files: |
-            ${{ env.REPO_NAME }} ${{ env.NEW_VERSION }}.zip
+            ${{ env.REPO_NAME }}-${{ env.NEW_VERSION }}.zip
