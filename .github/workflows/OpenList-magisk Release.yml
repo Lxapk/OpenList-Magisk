@@ -118,4 +118,4 @@ jobs:
           name: "${{ env.REPO_NAME }} ${{ env.NEW_VERSION }}"
           body_path: release_notes.txt
           files: |
-            ${{ env.REPO_NAME }}-${{ env.NEW_VERSION }}.zip
+            ${{ env.REPO_NAME }}_${{ env.NEW_VERSION }}.zip
