@@ -1078,7 +1078,7 @@ body {
 
 .styled-select,
 .styled-input,
-.modal-version-status {
+.styled-display-box {
     width: 100%;
     height: 46px;
     min-height: 46px;
@@ -1095,11 +1095,17 @@ body {
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.modal-version-status {
+.styled-display-box {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 0;
+    user-select: none;
+}
+
+.display-box-prefix {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-sub);
 }
 
 .styled-select {

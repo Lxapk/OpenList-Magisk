@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#f1f5fb" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#0b0f19" media="(prefers-color-scheme: dark)">
     <title>OpenList</title>
-    <link rel="stylesheet" href="assets/style.css?v=1.1.3_hsync">
+    <link rel="stylesheet" href="assets/style.css?v=1.1.3_sync2">
 </head>
 <body>
     <div class="app-layout">
@@ -520,9 +520,12 @@
             </div>
 
             <div class="modal-body">
-                <div class="modal-version-status">
-                    <span class="text-muted">本地安装版本：</span>
-                    <strong class="font-mono text-primary" id="modalCurrentVer">-</strong>
+                <div class="form-group">
+                    <label class="form-label">本地安装版本</label>
+                    <div class="styled-display-box">
+                        <span class="display-box-prefix">OpenList Core</span>
+                        <strong class="font-mono text-primary" id="modalCurrentVer">-</strong>
+                    </div>
                 </div>
 
                 <div class="form-group mt-2">
@@ -701,6 +704,6 @@
     
     <div id="appToast" class="app-toast"></div>
 
-    <script src="assets/script.js?v=1.1.3_hsync"></script>
+    <script src="assets/script.js?v=1.1.3_sync2"></script>
 </body>
 </html>
