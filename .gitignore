@@ -1,0 +1,7 @@
+*.zip
+*.log
+OpenList-magisk/log.log
+OpenList-magisk/data/temp/
+OpenList-magisk/data/theme.conf
+.DS_Store
+Thumbs.db

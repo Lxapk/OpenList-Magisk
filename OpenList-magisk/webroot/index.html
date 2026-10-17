@@ -2,222 +2,697 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-        (function () {
-            try {
-                const theme = localStorage.getItem('openlist-theme') || 'light';
-                if (theme === 'dark') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
-            } catch (_) {}
-        })();
-    </script>
-    <title>OpenList 管理控制台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>OpenList</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="header-bg">
-                <div class="theme-toggle" id="themeToggle">
-                    <svg class="theme-icon theme-icon-light" viewBox="0 0 24 24">
-                        <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.166 7.758a.75.75 0 001.06-1.06L5.634 5.106a.75.75 0 00-1.06 1.06l1.59 1.591z"/>
-                    </svg>
-                    <svg class="theme-icon theme-icon-dark" viewBox="0 0 24 24">
-                        <path d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/>
-                    </svg>
-                </div>
-                <h1 class="title">OpenList 管理控制台</h1>
-                <p class="subtitle">乐享网：<a href="https://www.lxapk.com" class="link">www.lxapk.com</a></p>
+    
+            <div id="viewHome" class="view-section active">
+                
+                <header class="home-header">
+                    <div class="brand-box">
+                        <span class="brand-badge">CORE</span>
+                        <h1 class="brand-name">OpenList 控制台</h1>
+                    </div>
+                    <div class="header-actions">
+                        <button id="themeToggleBtn" type="button" class="header-icon-btn" title="切换深色/浅色">
+                            <svg class="icon icon-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                            <svg class="icon icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                        </button>
+                    </div>
+                </header>
+
+                
+                <section class="hero-card" id="heroStatusCard">
+                    
+                    <div class="hero-bg-glow"></div>
+                    
+                    <div class="hero-content">
+                        <div class="hero-badge-row">
+                            <span class="hero-badge" id="heroBadge">
+                                <span class="badge-dot"></span>
+                                <span id="heroBadgeText">服务检测中</span>
+                            </span>
+                            <span class="hero-version-pill" id="heroVersionPill">v...</span>
+                        </div>
+
+                        <h2 class="hero-title" id="heroTitle">OpenList 服务</h2>
+                        <p class="hero-subtitle" id="heroSubtitle">http://127.0.0.1:5244</p>
+                    </div>
+
+                    
+                    <button type="button" id="copyEndpointHeroBtn" class="hero-action-btn" title="点击复制访问地址">
+                        <div class="hero-action-glow"></div>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                        </svg>
+                    </button>
+                </section>
+
+                
+                <section class="grid-cards-row">
+                    
+                    <div class="feature-card feature-update" id="openUpdateModalBtn">
+                        <div class="feature-header">
+                            <div class="feature-icon-box bg-mint">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                            </div>
+                            <span class="feature-tag">版本升级</span>
+                        </div>
+                        <h3 class="feature-title">版本管理</h3>
+                        <p class="feature-desc">检测并升级至官方新版</p>
+                    </div>
+
+                    
+                    <div class="feature-card feature-security" id="openPasswordModalBtn">
+                        <div class="feature-header">
+                            <div class="feature-icon-box bg-blue">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            </div>
+                            <span class="feature-tag">安全凭据</span>
+                        </div>
+                        <h3 class="feature-title">密码设置</h3>
+                        <p class="feature-desc">在线修改管理员密码</p>
+                    </div>
+                </section>
+
+                
+                <section class="section-container">
+                    <div class="section-header">
+                        <h2 class="section-title">快捷运维</h2>
+                        <span class="section-count" id="operationCountBadge">3</span>
+                    </div>
+
+                    <div class="cards-list">
+                        
+                        <div class="list-item-card">
+                            <div class="item-avatar avatar-purple">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <rect width="20" height="8" x="2" y="2" rx="2" ry="2"/>
+                                    <rect width="20" height="8" x="2" y="14" rx="2" ry="2"/>
+                                    <line x1="6" x2="6.01" y1="6" y2="6"/>
+                                    <line x1="6" x2="6.01" y1="18" y2="18"/>
+                                </svg>
+                            </div>
+                            <div class="item-content">
+                                <h4 class="item-title">服务运行状态</h4>
+                                <div class="item-meta">
+                                    <span class="item-desc" id="itemPidDesc">检查进程状态...</span>
+                                    <span class="item-pill" id="itemStatusPill">待机</span>
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" id="restartServiceBtn" class="action-circle-btn" title="重启服务进程">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                                        <path d="M21 3v5h-5"/>
+                                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                                        <path d="M8 16H3v5"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        
+                        <div class="list-item-card" id="cardQuickBackup">
+                            <div class="item-avatar avatar-amber">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                    <path d="M3 5v14a9 3 0 0 0 18 0V5"/>
+                                    <path d="M3 12a9 3 0 0 0 18 0"/>
+                                </svg>
+                            </div>
+                            <div class="item-content">
+                                <h4 class="item-title">数据配置归档</h4>
+                                <div class="item-meta">
+                                    <span class="item-desc" id="quickBackupDesc">存储卡备份快照</span>
+                                    <span class="item-pill">/data</span>
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" id="quickBackupBtn" class="action-circle-btn" title="一键备份数据">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/>
+                                        <polyline points="17 21 17 13 7 13 7 21"/>
+                                        <polyline points="7 3 7 8 15 8"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        
+                        <div class="list-item-card" id="cardQuickLog">
+                            <div class="item-avatar avatar-cyan">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <polyline points="4 17 10 11 4 5"/>
+                                    <line x1="12" y1="19" x2="20" y2="19"/>
+                                </svg>
+                            </div>
+                            <div class="item-content">
+                                <h4 class="item-title">系统日志监控</h4>
+                                <div class="item-meta">
+                                    <span class="item-desc">OpenList 核心与模块引导日志</span>
+                                    <span class="item-pill">实时</span>
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" id="quickViewLogBtn" class="action-circle-btn" title="查看日志">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <circle cx="11" cy="11" r="8"/>
+                                        <path d="m21 21-4.3-4.3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </header>
 
-        <main>
-            <section class="page active" data-page="home">
-                <div class="status-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                            </svg>
-                        </div>
-                        <h2 class="card-title">服务状态</h2>
+            
+            <div id="viewBackup" class="view-section">
+                <header class="subpage-header">
+                    <h2 class="subpage-title">数据备份与恢复</h2>
+                    <p class="subpage-desc">自动归档至 /sdcard/OpenList/backups</p>
+                </header>
+
+                <div class="action-banner-card">
+                    <div class="action-banner-text">
+                        <h3>创建完整快照</h3>
+                        <p>备份 openlist 数据库、驱动设置与自定义配置</p>
                     </div>
-                    <div class="status-grid" id="status">
-                        <div class="status-item">
-                            <span class="status-label">OpenList 服务</span>
-                            <span class="status-value" id="openlistStatus">加载中…</span>
+                    <button type="button" id="tabCreateBackupBtn" class="pill-action-btn">
+                        <svg class="icon icon-sm btn-spin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                            <polyline points="17 21 17 13 7 13 7 21"/>
+                            <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        <span>立即备份</span>
+                    </button>
+                </div>
+
+                <div class="section-container mt-4">
+                    <div class="section-header">
+                        <h3 class="section-title">存储卡现有备份</h3>
+                        <button type="button" id="refreshBackupListBtn" class="refresh-header-btn" title="刷新存储卡备份列表">
+                            <svg class="refresh-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21.5 2v6h-6"/>
+                                <path d="M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                            </svg>
+                            <span>刷新</span>
+                        </button>
+                    </div>
+                    <div id="backupFilesList" class="cards-list">
+                        
+                        <div class="empty-state">正在检索备份文件...</div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="viewLogs" class="view-section">
+                
+                <header class="subpage-header log-page-header">
+                    <div>
+                        <h2 class="subpage-title">系统日志</h2>
+                        <p class="subpage-desc">守护进程与模块引导审计</p>
+                    </div>
+                    <div class="log-live-pill">
+                        <span class="live-pulse-dot"></span>
+                        <span class="live-text">实时</span>
+                    </div>
+                </header>
+
+                
+                <div class="log-modern-bar">
+                    <div class="log-capsule-switch">
+                        <button type="button" class="log-tab-btn active" data-logfile="module">引导日志</button>
+                        <button type="button" class="log-tab-btn" data-logfile="service">服务日志</button>
+                    </div>
+
+                    <div class="log-icon-tools">
+                        <button type="button" id="refreshLogsBtn" class="log-tool-btn" title="刷新最新日志">
+                            <svg class="icon btn-spin-icon" viewBox="0 0 24 24">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                                <path d="M21 3v5h-5"/>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                                <path d="M8 16H3v5"/>
+                            </svg>
+                        </button>
+                        <button type="button" id="copyLogsBtn" class="log-tool-btn" title="复制当前全部日志">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                            </svg>
+                        </button>
+                        <button type="button" id="clearCurrentLogBtn" class="log-tool-btn tool-danger" title="清空当前日志">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                
+                <div class="log-console-card">
+                    <div class="log-console-topbar">
+                        <div class="console-file-box">
+                            <span class="console-file-path font-mono" id="activeLogPathDisplay">log.log</span>
                         </div>
-                        <div class="status-item">
-                            <span class="status-label">本地安装版本</span>
-                            <span class="status-value" id="versionStatus">加载中…</span>
+                        <span class="console-line-badge font-mono" id="logLineCountBadge">0 行</span>
+                    </div>
+                    <div id="terminalStream" class="log-console-stream">
+                        <div class="console-row text-muted">加载日志内容中...</div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div id="viewAbout" class="view-section">
+                
+                <div class="profile-hero-card">
+                    <div class="profile-avatar-circle">
+                        <svg class="icon icon-profile" viewBox="0 0 24 24">
+                            <rect width="20" height="8" x="2" y="2" rx="2.5" ry="2.5"/>
+                            <rect width="20" height="8" x="2" y="14" rx="2.5" ry="2.5"/>
+                            <line x1="6" x2="6.01" y1="6" y2="6"/>
+                            <line x1="6" x2="6.01" y1="18" y2="18"/>
+                        </svg>
+                    </div>
+                    <div class="profile-info-content">
+                        <div class="profile-name-row">
+                            <h2 class="profile-name">OpenList Core</h2>
+                            <span class="profile-badge-pill">v1.1.2</span>
                         </div>
-                        <div class="status-item">
-                            <span class="status-label">本机设备IP</span>
-                            <span class="status-value" id="ipStatus">加载中…</span>
+                        <p class="profile-tagline">高性能 Android 私有云与存储网关模块</p>
+                        <div class="profile-chips">
+                            <span class="profile-chip">
+                                <span class="badge-dot dot-green"></span>
+                                <span>运行活跃</span>
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="features-section">
-                    <h2 class="section-title">功能设置</h2>
-                    <div class="features-grid">
-                        <a href="#" class="feature-card" data-nav="update">
-                            <div class="feature-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79 2.73 2.71 7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.53-9.11-.02-12.58 3.51-3.47 9.14-3.47 12.65 0L21 3v7.12zM12.5 8v4.25l3.5 2.08-.72 1.21L11 13V8h1.5z"/>
-                                </svg>
+                
+                <div class="settings-group">
+                    <div class="settings-group-title">外观与个性化</div>
+                    <div class="settings-group-card">
+                        
+                        <div class="theme-palette-block">
+                            <div class="theme-palette-label">
+                                <span class="theme-label-main">主题配色</span>
+                                <span class="theme-label-sub">全局主色调与强调色</span>
                             </div>
-                            <h3 class="feature-title">版本管理</h3>
-                            <p class="feature-desc">检查更新、安装指定版本</p>
-                        </a>
-                        <a href="#" class="feature-card" data-nav="password">
-                            <div class="feature-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-                                </svg>
+                            <div class="theme-color-palette" id="themeColorPalette">
+                                <button type="button" class="color-dot-btn active" data-accent="blue" title="克莱因蓝 (默认)" style="--color-preview: #1b64f2;">
+                                    <span class="color-dot-circle"></span>
+                                    <span class="color-dot-name">克莱因蓝</span>
+                                </button>
+                                <button type="button" class="color-dot-btn" data-accent="emerald" title="翡翠绿" style="--color-preview: #059669;">
+                                    <span class="color-dot-circle"></span>
+                                    <span class="color-dot-name">翡翠绿</span>
+                                </button>
+                                <button type="button" class="color-dot-btn" data-accent="violet" title="极光紫" style="--color-preview: #7c3aed;">
+                                    <span class="color-dot-circle"></span>
+                                    <span class="color-dot-name">极光紫</span>
+                                </button>
+                                <button type="button" class="color-dot-btn" data-accent="orange" title="日落橙" style="--color-preview: #ea580c;">
+                                    <span class="color-dot-circle"></span>
+                                    <span class="color-dot-name">日落橙</span>
+                                </button>
+                                <button type="button" class="color-dot-btn" data-accent="dark" title="曜石钛灰" style="--color-preview: #334155;">
+                                    <span class="color-dot-circle"></span>
+                                    <span class="color-dot-name">曜石灰</span>
+                                </button>
                             </div>
-                            <h3 class="feature-title">密码设置</h3>
-                            <p class="feature-desc">修改管理密码</p>
-                        </a>
-                        <a href="#" class="feature-card" data-nav="backup">
-                            <div class="feature-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-                                </svg>
+                        </div>
+
+                        
+                        <div class="settings-item-row" id="toggleDarkModeRow">
+                            <div class="settings-item-left">
+                                <div class="settings-item-icon bg-purple">
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                                </div>
+                                <div class="settings-item-text">
+                                    <span class="settings-item-name">深色模式外观</span>
+                                    <span class="settings-item-desc" id="currentThemeDesc">高对比沉浸黑白模式</span>
+                                </div>
                             </div>
-                            <h3 class="feature-title">备份恢复</h3>
-                            <p class="feature-desc">备份配置或恢复数据</p>
-                        </a>
-                        <a href="#" class="feature-card" data-nav="log">
-                            <div class="feature-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                                </svg>
+                            <div class="settings-item-right">
+                                <label class="ui-switch" title="切换深色/浅色外观">
+                                    <input type="checkbox" id="myPageDarkSwitch">
+                                    <span class="ui-switch-slider"></span>
+                                </label>
                             </div>
-                            <h3 class="feature-title">日志管理</h3>
-                            <p class="feature-desc">查看、清理日志文件</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="settings-group">
+                    <div class="settings-group-title">系统与运行环境</div>
+                    <div class="settings-group-card">
+                        
+                        <div class="settings-item-row">
+                            <div class="settings-item-left">
+                                <div class="settings-item-icon bg-blue">
+                                    <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>
+                                </div>
+                                <span class="settings-item-name">CPU 运行架构</span>
+                            </div>
+                            <div class="settings-item-right">
+                                <span class="settings-value-pill font-mono" id="aboutArchDetail">aarch64</span>
+                            </div>
+                        </div>
+
+                        
+                        <div class="settings-item-row clickable-row" id="copyModPathRow" title="点击复制模块数据路径">
+                            <div class="settings-item-left">
+                                <div class="settings-item-icon bg-amber">
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                </div>
+                                <div class="settings-item-text">
+                                    <span class="settings-item-name">模块数据路径</span>
+                                    <span class="settings-item-desc font-mono text-small">/data/adb/modules/OpenList</span>
+                                </div>
+                            </div>
+                            <div class="settings-item-right">
+                                <span class="settings-action-icon">
+                                    <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                </span>
+                            </div>
+                        </div>
+
+                        
+                        <div class="settings-item-row">
+                            <div class="settings-item-left">
+                                <div class="settings-item-icon bg-mint">
+                                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                </div>
+                                <span class="settings-item-name">默认服务端口</span>
+                            </div>
+                            <div class="settings-item-right">
+                                <span class="settings-value-pill font-mono">5244</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="settings-group">
+                    <div class="settings-group-title">支持与社区</div>
+                    <div class="settings-group-card">
+                        
+                        <a href="https://www.lxapk.com" target="_blank" rel="noopener" class="settings-item-link" title="访问乐享网官方支持">
+                            <div class="settings-item-left">
+                                <div class="settings-item-icon avatar-indigo">
+                                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                                </div>
+                                <div class="settings-item-text">
+                                    <span class="settings-item-name">乐享网</span>
+                                    <span class="settings-item-desc">www.lxapk.com · 官方支持</span>
+                                </div>
+                            </div>
+                            <div class="settings-item-right">
+                                <span class="settings-chevron">
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                                </span>
+                            </div>
+                        </a>
+
+                        
+                        <a href="https://github.com/OpenListTeam/OpenList" target="_blank" rel="noopener" class="settings-item-link" title="访问 OpenList 官方 GitHub">
+                            <div class="settings-item-left">
+                                <div class="settings-item-icon bg-dark">
+                                    <svg class="icon icon-github" viewBox="0 0 24 24">
+                                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+                                        <path d="M9 18c-4.51 2-5-2-7-2"/>
+                                    </svg>
+                                </div>
+                                <div class="settings-item-text">
+                                    <span class="settings-item-name">官方发布</span>
+                                    <span class="settings-item-desc">OpenList 官方开源仓库 (GitHub)</span>
+                                </div>
+                            </div>
+                            <div class="settings-item-right">
+                                <span class="settings-chevron">
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+                                </span>
+                            </div>
                         </a>
                     </div>
                 </div>
-            </section>
-
-            <section class="page" data-page="update">
-                <a href="#" class="nav-back" data-nav="home">
-                    <svg viewBox="0 0 24 24" class="nav-back-icon">
-                        <path d="M15 18l-6-6 6-6"/>
-                    </svg>
-                    返回
-                </a>
-                <div class="status-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79 2.73 2.71 7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.53-9.11-.02-12.58 3.51-3.47 9.14-3.47 12.65 0L21 3v7.12zM12.5 8v4.25l3.5 2.08-.72 1.21L11 13V8h1.5z"/>
-                            </svg>
-                        </div>
-                        <h2 class="card-title">版本管理</h2>
-                    </div>
-                    <select class="input" id="versionSelect">
-                        <option value="">请先检查版本以选择更新版本</option>
-                    </select>
-                    <div class="backup-restore-grid">
-                        <button class="btn btn-success" id="checkVersionBtn">检查版本</button>
-                        <button class="btn btn-primary" id="updateBtn">开始更新</button>
-                    </div>
-                    <div class="log" id="updateLog">
-                        <p class="log-item">📢 点击“检查版本”或“开始更新”后，日志将在此显示。</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="page" data-page="password">
-                <a href="#" class="nav-back" data-nav="home">
-                    <svg viewBox="0 0 24 24" class="nav-back-icon">
-                        <path d="M15 18l-6-6 6-6"/>
-                    </svg>
-                    返回
-                </a>
-                <div class="status-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-                            </svg>
-                        </div>
-                        <h2 class="card-title">密码设置</h2>
-                    </div>
-                    <input type="password" class="input" id="password" placeholder="输入新密码">
-                    <input type="password" class="input" id="confirmPassword" placeholder="确认新密码">
-                    <button class="btn btn-primary" id="setPasswordBtn">设置密码</button>
-                </div>
-            </section>
-
-            <section class="page" data-page="backup">
-                <a href="#" class="nav-back" data-nav="home">
-                    <svg viewBox="0 0 24 24" class="nav-back-icon">
-                        <path d="M15 18l-6-6 6-6"/>
-                    </svg>
-                    返回
-                </a>
-                <div class="status-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-                            </svg>
-                        </div>
-                        <h2 class="card-title">备份恢复</h2>
-                    </div>
-                    <div class="backup-restore-grid">
-                        <button class="btn btn-success" id="backupBtn">备份数据</button>
-                        <button class="btn btn-primary" id="restoreBtn">恢复数据</button>
-                    </div>
-                    <select class="input" id="backupSelect">
-                        <option value="">请先备份或等待列表刷新…</option>
-                    </select>
-                    <div class="log" id="backupLog">
-                        <p class="log-item">📦 点击"备份数据"创建备份，恢复备份在下方选择并恢复</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="page" data-page="log">
-                <a href="#" class="nav-back" data-nav="home">
-                    <svg viewBox="0 0 24 24" class="nav-back-icon">
-                        <path d="M15 18l-6-6 6-6"/>
-                    </svg>
-                    返回
-                </a>
-                <div class="status-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                            </svg>
-                        </div>
-                        <h2 class="card-title">日志管理</h2>
-                    </div>
-                    <select class="input" id="logSelect">
-                        <option value="">请选择日志文件</option>
-                    </select>
-                    <button class="btn btn-danger" id="clearLogBtn">清空日志</button>
-                    <div class="log" id="logContent">
-                        <p class="log-item">📜 请选择日志文件查看内容，或点击“清空日志”清空选中的日志文件。</p>
-                    </div>
-                </div>
-            </section>
+            </div>
         </main>
 
-        <footer class="footer">
-            懂得自己无知 ▪ 说明已有收获
-        </footer>
+        
+        <nav class="bottom-nav-bar">
+            <button type="button" class="nav-item active" data-view="viewHome">
+                <div class="nav-icon-wrap">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+                <span class="nav-label">首页</span>
+            </button>
+
+            <button type="button" class="nav-item" data-view="viewBackup">
+                <div class="nav-icon-wrap">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/>
+                    </svg>
+                </div>
+                <span class="nav-label">备份</span>
+            </button>
+
+            <button type="button" class="nav-item" data-view="viewLogs">
+                <div class="nav-icon-wrap">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                </div>
+                <span class="nav-label">日志</span>
+            </button>
+
+            <button type="button" class="nav-item" data-view="viewAbout">
+                <div class="nav-icon-wrap">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <span class="nav-label">我的</span>
+            </button>
+        </nav>
     </div>
 
-    <div class="spinner hidden" id="spinner">
-        <div class="spinner-inner"></div>
+    
+    <div id="updateModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="drawer-handle"></div>
+            <div class="modal-header">
+                <div class="modal-title-box">
+                    <span class="modal-tag">OTA</span>
+                    <h3 class="modal-title">OpenList 版本管理</h3>
+                </div>
+                <button type="button" class="modal-close-btn" id="closeUpdateModalBtn">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-version-status">
+                    <span class="text-muted">本地安装版本：</span>
+                    <strong class="font-mono text-primary" id="modalCurrentVer">-</strong>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="form-label">选择要安装的目标版本</label>
+                    <div class="select-wrap" id="versionSelectWrap">
+                        
+                        <select id="modalVersionSelect" class="hidden-native-select" style="display: none;">
+                            <option value="">点击下方「检测新版本」加载</option>
+                        </select>
+                        
+                        <div id="customVersionSelectTrigger" class="styled-select custom-select-trigger" tabindex="0" role="button" aria-haspopup="dialog" title="点击选择目标版本">
+                            <span id="customVersionSelectText" class="trigger-text">点击下方「检测新版本」加载</span>
+                        </div>
+                        <div class="select-chevron-icon" title="展开版本列表">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <button type="button" id="modalStartUpdateBtn" class="theme-primary-btn mt-4" data-action="check">
+                    <svg class="icon icon-sm btn-spin-icon" id="modalActionBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                        <path d="M21 3v5h-5"/>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                        <path d="M8 16H3v5"/>
+                    </svg>
+                    <span class="btn-text" id="modalActionBtnText">检测新版本</span>
+                </button>
+            </div>
+        </div>
     </div>
+
+    
+    <div id="versionPickerModal" class="modal-backdrop version-picker-backdrop">
+        <div class="version-picker-dialog" role="dialog" aria-modal="true">
+            <div class="version-picker-header">
+                <h4 class="version-picker-title">选择目标版本</h4>
+                <button type="button" class="version-picker-close-btn" id="closeVersionPickerBtn" title="关闭">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="versionPickerOptionsList" class="version-picker-options">
+                
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="passwordModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="drawer-handle"></div>
+            <div class="modal-header">
+                <div class="modal-title-box">
+                    <span class="modal-tag">AUTH</span>
+                    <h3 class="modal-title">管理员密码设置</h3>
+                </div>
+                <button type="button" class="modal-close-btn" id="closePasswordModalBtn">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newPasswordInput" class="form-label">新管理员密码</label>
+                    <input type="password" id="newPasswordInput" placeholder="输入新密码 (6-32 位)" class="styled-input">
+                </div>
+                <div class="form-group mt-2">
+                    <label for="confirmPasswordInput" class="form-label">再次确认密码</label>
+                    <input type="password" id="confirmPasswordInput" placeholder="请再次输入确认" class="styled-input">
+                </div>
+
+                
+                <button type="button" id="submitPasswordBtn" class="theme-primary-btn mt-3">
+                    <svg class="icon icon-sm btn-spin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span class="btn-text">保存并生效</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="restoreModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="drawer-handle"></div>
+            <div class="modal-header">
+                <div class="modal-title-box">
+                    <span class="modal-tag bg-amber">RESTORE</span>
+                    <h3 class="modal-title">确认恢复数据快照</h3>
+                </div>
+                <button type="button" class="modal-close-btn" id="closeRestoreModalBtn">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="restore-alert-box">
+                    <div class="restore-alert-icon">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="restore-alert-text">
+                        <strong>覆盖现有数据警告</strong>
+                        <p>还原快照将终止当前 OpenList 进程，并用该备份全量覆盖数据目录。操作完成后守护进程将自动拉起新实例。</p>
+                    </div>
+                </div>
+
+                <div class="restore-target-box mt-3">
+                    <span class="text-muted">待还原备份：</span>
+                    <strong class="font-mono text-primary" id="restoreTargetFilename">-</strong>
+                </div>
+
+                <div class="modal-actions-grid mt-4">
+                    <button type="button" id="cancelRestoreBtn" class="solid-cancel-btn">取消</button>
+                    <button type="button" id="confirmRestoreBtn" class="solid-danger-btn">
+                        
+                        <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <polyline points="3 3 3 8 8 8"/>
+                        </svg>
+                        <span>确认还原覆盖</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="deleteBackupModal" class="modal-backdrop">
+        <div class="modal-card">
+            <div class="drawer-handle"></div>
+            <div class="modal-header">
+                <div class="modal-title-box">
+                    <span class="modal-tag bg-danger">DELETE</span>
+                    <h3 class="modal-title">删除备份快照</h3>
+                </div>
+                <button type="button" class="modal-close-btn" id="closeDeleteBackupModalBtn">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="restore-alert-box alert-danger">
+                    <div class="restore-alert-icon text-danger">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                    </div>
+                    <div class="restore-alert-text">
+                        <strong>永久删除确认</strong>
+                        <p>该操作将永久从存储卡中移除该备份快照文件，且无法撤销找回。</p>
+                    </div>
+                </div>
+
+                <div class="restore-target-box mt-3">
+                    <span class="text-muted">待删除文件：</span>
+                    <strong class="font-mono text-danger" id="deleteTargetFilename">-</strong>
+                </div>
+
+                <div class="modal-actions-grid mt-4">
+                    <button type="button" id="cancelDeleteBackupBtn" class="solid-cancel-btn">取消</button>
+                    <button type="button" id="confirmDeleteBackupBtn" class="solid-danger-btn">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                        <span>确认永久删除</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="appToast" class="app-toast"></div>
 
     <script src="assets/script.js"></script>
 </body>

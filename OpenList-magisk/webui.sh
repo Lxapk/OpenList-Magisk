@@ -9,13 +9,17 @@ RED='\033[0;91m'
 NC='\033[0m'
 
 find_busybox() {
-    for path in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox; do
-        [ -f "$path" ] && {
+    for path in /data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/ap/bin/busybox; do
+        [ -f "$path" ] && [ -x "$path" ] && {
             BUSYBOX="$path"
             return 0
         }
     done
-    BUSYBOX="busybox"
+    if command -v busybox >/dev/null 2>&1; then
+        BUSYBOX="busybox"
+        return 0
+    fi
+    BUSYBOX=""
     return 1
 }
 find_busybox
@@ -52,12 +56,8 @@ get_versions() {
     tmpfile="$MODDIR/versions_tmp.log"
     > "$tmpfile"
     
-    RELEASES_URL="https://api.github.com/repos/OpenListTeam/OpenList/releases"
     versions=$(
-        "$BUSYBOX" wget -q --no-check-certificate -O - "$RELEASES_URL" 2>/dev/null |
-        grep -o '"tag_name": "[^"]*"' |
-        sed 's/"tag_name": "//;s/"//g' |
-        sort -uVr |
+        sh "$MODDIR/update.sh" list-versions 2>/dev/null |
         head -n 8
     )
     
@@ -68,10 +68,9 @@ get_versions() {
     fi
     
     echo "$versions" > "$tmpfile"
-    VERSIONS_ARRAY=()
     i=1
     while IFS= read -r version; do
-        VERSIONS_ARRAY[$i]="$version"
+        [ -z "$version" ] && continue
         if [ $i -eq 1 ]; then
             printf "${GREEN}%2d. %s (最新稳定版)${NC}\n" $i "$version"
         else
@@ -81,7 +80,7 @@ get_versions() {
     done < "$tmpfile"
     
     array_length=$((i - 1))
-    if [ "$array_length" -eq 0 ]; then
+    if [ "$array_length" -le 0 ]; then
         printf "${RED}✗ 版本列表为空${NC}\n"
         rm -f "$tmpfile"
         return 1
@@ -96,13 +95,14 @@ get_versions() {
             rm -f "$tmpfile"
             return 1
             ;;
+        0)
+            printf "${YELLOW}▶ 已取消更新${NC}\n"
+            rm -f "$tmpfile"
+            return 1
+            ;;
         *)
-            if [ "$choice" -eq 0 ]; then
-                printf "${YELLOW}▶ 已取消更新${NC}\n"
-                rm -f "$tmpfile"
-                return 1
-            elif [ "$choice" -le "$array_length" ] && [ "$choice" -ge 1 ]; then
-                TARGET_VERSION="${VERSIONS_ARRAY[$choice]}"
+            if [ "$choice" -le "$array_length" ] && [ "$choice" -ge 1 ]; then
+                TARGET_VERSION=$(sed -n "${choice}p" "$tmpfile")
                 printf "${GREEN}▶ 已选择版本: ${YELLOW}%s${NC}\n" "$TARGET_VERSION"
                 rm -f "$tmpfile"
                 return 0
@@ -161,12 +161,12 @@ manual_update() {
 
 backup_data() {
     printf "\n${BLUE}▶ 正在创建数据备份...${NC}\n"
-    timestamp=$(TZ='Asia/Shanghai' date +%Y%m%d-%H%M%S)
+    timestamp=$(TZ='Asia/Shanghai' date +%Y%m%d-%H%M%S 2>/dev/null || date +%Y%m%d-%H%M%S)
     backup_name="OpenList-backup-${timestamp}.tar.gz"
     backup_path="/sdcard/OpenList/backups/${backup_name}"
 
     mkdir -p "/sdcard/OpenList/backups" 2>/dev/null
-    tar --exclude='data/temp' --exclude='data/log' -czf "${backup_path}" -C "/data/adb/modules/OpenList" data 2>&1
+    tar --exclude='data/temp' --exclude='data/log' -czf "${backup_path}" -C "${MODDIR}" data 2>&1
     if [ $? -eq 0 ]; then
         printf "${GREEN}✓ 备份完成！${NC}\n"
         printf "  📁 文件路径: ${BLUE}${backup_path}${NC}\n"
@@ -213,10 +213,10 @@ restore_data() {
     fi
 
     printf "${YELLOW}正在停止 OpenList 服务...${NC}\n"
-    pkill -9 -f /data/adb/modules/OpenList/bin/openlist 2>/dev/null
+    pkill -9 -f "${MODDIR}/bin/openlist" 2>/dev/null
 
     printf "${YELLOW}正在恢复数据...${NC}\n"
-    tar -xzf "${backup_file}" -C /data/adb/modules/OpenList 2>&1
+    tar -xzf "${backup_file}" -C "${MODDIR}" 2>&1
     if [ $? -eq 0 ]; then
         printf "${GREEN}✓ 数据恢复成功${NC}\n"
     else
@@ -261,14 +261,14 @@ while true; do
         2)
             printf "\n${BLUE}▶ 设置管理员密码${NC}\n"
             printf "${GREEN}请输入新密码: ${NC}"
-            stty -echo
+            stty -echo 2>/dev/null || true
             read password
-            stty echo
+            stty echo 2>/dev/null || true
             printf "\n"
             printf "${GREEN}请再次输入新密码: ${NC}"
-            stty -echo
+            stty -echo 2>/dev/null || true
             read confirm_password
-            stty echo
+            stty echo 2>/dev/null || true
             printf "\n"
 
             if [ "$password" != "$confirm_password" ]; then
