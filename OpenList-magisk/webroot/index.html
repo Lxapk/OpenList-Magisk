@@ -517,12 +517,20 @@
             </div>
 
             <div class="modal-body">
-                <div class="modal-version-status">
-                    <span class="text-muted">本地安装版本：</span>
-                    <strong class="font-mono text-primary" id="modalCurrentVer">-</strong>
+                <div class="form-group">
+                    <label class="form-label">本地已安装版本</label>
+                    <div class="styled-display-box">
+                        <div class="display-box-left">
+                            <span class="display-box-prefix">OpenList Core</span>
+                        </div>
+                        <div class="display-box-right">
+                            <strong class="font-mono text-primary" id="modalCurrentVer">-</strong>
+                            <span class="display-box-dot"></span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group mt-3">
+                <div class="form-group mt-2">
                     <label class="form-label">选择要安装的目标版本</label>
                     <div class="select-wrap" id="versionSelectWrap">
                         
@@ -542,7 +550,7 @@
                 </div>
 
                 
-                <button type="button" id="modalStartUpdateBtn" class="theme-primary-btn mt-4" data-action="check">
+                <button type="button" id="modalStartUpdateBtn" class="theme-primary-btn mt-3" data-action="check">
                     <svg class="icon icon-sm btn-spin-icon" id="modalActionBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
                         <path d="M21 3v5h-5"/>
