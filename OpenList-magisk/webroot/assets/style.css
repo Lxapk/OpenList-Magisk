@@ -1695,6 +1695,24 @@ body {
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
     transform: translateY(100%);
     transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    box-sizing: border-box;
+}
+
+#updateModal .modal-card,
+#passwordModal .modal-card {
+    height: 318px !important;
+    min-height: 318px !important;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#updateModal .modal-body,
+#passwordModal .modal-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .drawer-handle {
