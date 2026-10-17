@@ -988,10 +988,14 @@ function updateThemeMode(next, showFeedback = true) {
 }
 
 function initTheme() {
-    const isDark = localStorage.getItem('openlist-theme') === 'dark';
-    if (isDark) {
-        document.documentElement.setAttribute('data-theme', 'dark');
+    const savedTheme = localStorage.getItem('openlist-theme');
+    let isDark = false;
+    if (savedTheme) {
+        isDark = (savedTheme === 'dark');
+    } else {
+        isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
     const mySwitch = document.getElementById('myPageDarkSwitch');
     const desc = document.getElementById('currentThemeDesc');
     if (mySwitch) mySwitch.checked = isDark;

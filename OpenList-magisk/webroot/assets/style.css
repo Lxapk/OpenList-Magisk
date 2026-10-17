@@ -1,5 +1,72 @@
 
 
+html {
+    background-color: var(--bg-page);
+    color-scheme: light;
+}
+
+[data-theme="dark"],
+html[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+:root {
+    --bg-page: #f1f5fb;
+    --bg-card: #ffffff;
+    --bg-card-subtle: #f8fafc;
+    --border-card: #edf2f7;
+    --text-main: #0f172a;
+    --text-sub: #64748b;
+    --text-faint: #94a3b8;
+
+    --primary: #1b64f2;
+    --primary-dark: #0d4ed8;
+    --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    --primary-soft: rgba(37, 99, 235, 0.08);
+
+    --radius-hero: 24px;
+    --radius-card: 20px;
+    --radius-sm: 12px;
+    --shadow-soft: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    --shadow-card: 0 6px 24px -4px rgba(37, 99, 235, 0.08);
+    --shadow-hero: 0 16px 36px -8px rgba(29, 78, 216, 0.35);
+}
+
+[data-theme="dark"] {
+    --bg-page: #0b0f19;
+    --bg-card: #131b2e;
+    --bg-card-subtle: #1a233a;
+    --border-card: #1e293b;
+    --text-main: #f8fafc;
+    --text-sub: #94a3b8;
+    --text-faint: #64748b;
+
+    --primary: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --primary-gradient: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    --primary-soft: rgba(59, 130, 246, 0.15);
+
+    --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 6px 24px -4px rgba(0, 0, 0, 0.4);
+    --shadow-hero: 0 16px 36px -8px rgba(0, 0, 0, 0.5);
+}
+
+[data-accent="blue"] {
+    --primary: #1b64f2;
+    --primary-dark: #0d4ed8;
+    --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    --primary-soft: rgba(37, 99, 235, 0.08);
+    --shadow-card: 0 6px 24px -4px rgba(37, 99, 235, 0.08);
+    --shadow-hero: 0 16px 36px -8px rgba(29, 78, 216, 0.35);
+}
+[data-theme="dark"][data-accent="blue"] {
+    --primary: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --primary-gradient: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    --primary-soft: rgba(59, 130, 246, 0.15);
+    --shadow-hero: 0 16px 36px -8px rgba(0, 0, 0, 0.5);
+}
+
 [data-accent="emerald"] {
     --primary: #059669;
     --primary-dark: #047857;
